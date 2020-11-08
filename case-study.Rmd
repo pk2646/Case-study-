@@ -1,11 +1,12 @@
 ---
 title: "case study"
 author: Pallavi Krishnamurthy
-output: github_document
+output: html_document
 ---
 ```{r set-up, include = FALSE}
 library(tidyverse)
 library(p8105.datasets)
+library(leaflet)
 
 knitr::opts_chunk$set(
   fig.width = 6,
@@ -71,5 +72,35 @@ nyc_airbnb %>%
   ggplot(aes(x = neighbourhood, y = price)) +
   geom_boxplot() +
   coord_flip()
+```
+
+```{r}
+nyc_airbnb %>% 
+  sample_n(1000) %>% 
+  ggplot(aes(x = lat, y = long, colour = price )) +
+  geom_point()
+```
+
+## creat a leaflet map 
+
+```{r}
+pal <- colorNumeric("viridis", nyc_airbnb %>% pull(stars))
+
+nyc_airbnb %>%
+  sample_n(1000) %>% 
+  leaflet() %>% 
+  addProviderTiles(providers$CartoDB.Positron) %>% 
+  addCircleMarkers(~lat, ~long, radius = 1, color = ~pal(stars))
+```
+
+```{r}
+pal <- colorNumeric("magma", nyc_airbnb %>% pull(stars))
+
+nyc_airbnb %>% 
+  drop_na(stars) %>% 
+  sample_n(5000) %>% 
+  leaflet() %>% 
+  addProviderTiles(providers$CartoDB.Positron) %>% 
+  addCircleMarkers(~lat, ~long, radius = 1, color = ~pal(stars))
 ```
 
