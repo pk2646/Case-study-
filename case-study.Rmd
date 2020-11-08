@@ -1,0 +1,75 @@
+---
+title: "case study"
+author: Pallavi Krishnamurthy
+output: github_document
+---
+```{r set-up, include = FALSE}
+library(tidyverse)
+library(p8105.datasets)
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+scale_colour_discrete = scale_color_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+```
+
+## load airbnb package 
+
+```{r}
+data("nyc_airbnb")
+```
+
+## Brainstrom with this dataset 
+
+*what is the best airbnb in staten island for <$100
+*what price range is the most popular?
+*what apartment features are related to the price?
+*cheapest room type in each neighbourhood?
+*hosts that have high ratings?
+
+## Answer some questions
+
+data cleaning 
+
+```{r}
+nyc_airbnb = 
+  nyc_airbnb %>% 
+  mutate(stars = review_scores_location / 2)
+```
+
+```{r}
+ nyc_airbnb %>% 
+  count(neighbourhood_group, room_type) %>% 
+  pivot_wider(names_from = room_type, values_from = n)
+```
+
+```{r}
+nyc_airbnb %>% 
+  group_by(neighbourhood_group, room_type) %>% 
+  summarize(mean_price = mean(price))
+```
+
+```{r}
+nyc_airbnb %>% 
+  filter(neighbourhood_group == "Manhattan") %>% 
+  count(neighbourhood)
+
+nyc_airbnb %>% 
+  filter(
+    price < 1000,
+    neighbourhood_group == "Manhattan") %>% 
+  mutate(neighbourhood = fct_reorder(neighbourhood, price)) %>% 
+  ggplot(aes(x = neighbourhood, y = price)) +
+  geom_boxplot() +
+  coord_flip()
+```
+
